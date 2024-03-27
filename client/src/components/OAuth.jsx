@@ -30,7 +30,7 @@ export default function OAuth() {
         })
       })
 
-      const data = res.json();
+      const data = await res.json();
       dispatch(signInSuccess(data))
       navigate('/')
 
@@ -40,6 +40,18 @@ export default function OAuth() {
   }
 
   return (
-    <button onClick={handleGoogleClick} type="button" className="bg-red-700 text-white p-3 rounded-lg uppercase hover:opacity-50">Continue with google</button>
+    <button
+      onClick={handleGoogleClick}
+      type="button"
+      className="
+        bg-red-700 
+        text-white 
+        p-3 
+        rounded-lg 
+        uppercase 
+        hover:opacity-50"
+    >
+      Continue with google
+    </button>
   )
 }
