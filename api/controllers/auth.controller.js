@@ -38,6 +38,7 @@ export const signin = async(req, res, next) => {
   }
 }
 
+// OAUTH CONTROLLER FUNCTION
 export const google = async (req, res, next) => {
   try {
     const user = await User.findOne({email: req.body.email})
@@ -49,10 +50,14 @@ export const google = async (req, res, next) => {
         .status(200)
         .json(rest)
     }else {
-
       const generatePassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8)
       const hashedPassword = bcryptjs.hashSync(generatePassword, 10)
-      const newUser = User({username: req.body.name.split(" ").join("").toLowerCase() + Math.random().toString(36).slice(-4), email: req.body.email, password: hashedPassword, avatar: req.body.photo})
+      const newUser = User({
+        username: req.body.name.split(" ").join("").toLowerCase() + Math.random().toString(36).slice(-4), 
+        email: req.body.email, 
+        password: hashedPassword, 
+        avatar: req.body.photo
+      })
 
       await newUser.save();
       const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET);
