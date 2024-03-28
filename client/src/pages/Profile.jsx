@@ -144,6 +144,8 @@ export default function Profile() {
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
 
+  const [successMessage, setSuccessMessage] =useState('')
+
   const handleFileUpload = (file) => {
     const storage = getStorage(app);
     const fileName = new Date().getTime() + file.name;
@@ -160,11 +162,20 @@ export default function Profile() {
       },
       () => {
         setFileUploadError(true);
+        setSuccessMessage('');
+        setTimeout(() => {
+          setFileUploadError(false)
+        }, 5000)
       },
       () => {
         // Upload completed successfully, handle any additional logic here
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setFormData({ ...formData, avatar: downloadURL });
+          setFileUploadError(false);
+          setSuccessMessage('Image successfully uploaded!');
+          setTimeout(() => {
+            setSuccessMessage("")
+          }, 5000)
         });
       }
     );
@@ -202,7 +213,7 @@ export default function Profile() {
           ) : filePerc > 0 && filePerc < 100 ? (
             <span className="text-slate-700">{`Uploading ${filePerc}%`}</span>
           ) : filePerc === 100 ? (
-            <span className="text-green-700">Image successfully uploaded!</span>
+            <span className="text-green-700">{successMessage}</span>
           ) : (
             ""
           )}
