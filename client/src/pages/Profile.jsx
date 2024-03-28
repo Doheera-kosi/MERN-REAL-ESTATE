@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getDownloadURL,
   getStorage,
@@ -7,16 +7,26 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../firebase";
+import {
+  updateUserFailure,
+  updateUserStart,
+  updateuserSuccess,
+} from "../redux/user/userSlice";
+
 
 export default function Profile() {
   const fileRef = useRef(null);
-  const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const { currentUser, loading, error } = useSelector((state) => state.user);
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
+  const [updateSuccess, setUpdateSuccess] = useState(false)
 
-  const [successMessage, setSuccessMessage] =useState('')
+  // console.log('ican', formData);
+
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleFileUpload = (file) => {
     const storage = getStorage(app);
@@ -34,20 +44,20 @@ export default function Profile() {
       },
       () => {
         setFileUploadError(true);
-        setSuccessMessage('');
+        setSuccessMessage("");
         setTimeout(() => {
-          setFileUploadError(false)
-        }, 5000)
+          setFileUploadError(false);
+        }, 5000);
       },
       () => {
         // Upload completed successfully, handle any additional logic here
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setFormData({ ...formData, avatar: downloadURL });
           setFileUploadError(false);
-          setSuccessMessage('Image successfully uploaded!');
+          setSuccessMessage("Image successfully uploaded!");
           setTimeout(() => {
-            setSuccessMessage("")
-          }, 5000)
+            setSuccessMessage("");
+          }, 5000);
         });
       }
     );
@@ -59,11 +69,39 @@ export default function Profile() {
     }
   }, [file]);
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      dispatch(updateUserStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json()
+      if (data.success === false) {
+        dispatch(updateUserFailure(data.message))
+        return;
+      }
+
+      dispatch(updateuserSuccess(data))
+      setUpdateSuccess(true)
+    } catch (error) {
+      dispatch(updateUserFailure(error.message));
+    }
+  };
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
 
-      <form className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           onChange={(e) => setFile(e.target.files[0])}
           type="file"
@@ -81,7 +119,10 @@ export default function Profile() {
 
         <p className="text-sm self-center">
           {fileUploadError ? (
-            <span className="text-red-700"> Image Upload Error (Must be less than 2MB)</span>
+            <span className="text-red-700">
+              {" "}
+              Image Upload Error (Must be less than 2MB)
+            </span>
           ) : filePerc > 0 && filePerc < 100 ? (
             <span className="text-slate-700">{`Uploading ${filePerc}%`}</span>
           ) : filePerc === 100 ? (
@@ -96,22 +137,28 @@ export default function Profile() {
           placeholder="username"
           className="border p-3 rounded-lg"
           id="username"
+          defaultValue={currentUser.username}
+          onChange={handleChange}
         />
         <input
           type="email"
           placeholder="email"
           className="border p-3 rounded-lg"
           id="email"
+          defaultValue={currentUser.email}
+          onChange={handleChange}
         />
         <input
           type="password"
           placeholder="password"
           className="border p-3 rounded-lg"
           id="password"
+          defaultValue={currentUser.password}
+          onChange={handleChange}
         />
 
-        <button className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80">
-          Update
+        <button disabled={loading} className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80">
+          {loading ? 'Loading...' : 'Update' }
         </button>
       </form>
 
@@ -119,6 +166,9 @@ export default function Profile() {
         <span className="text-red-700 cursor-pointer">Delete Account</span>
         <span className="text-red-700 cursor-pointer">Sign Out</span>
       </div>
+
+      <p className="text-red-700 mt-5">{error ? error : ''}</p>
+      <p className="text-green-700">{updateSuccess ? 'User is successfully updated!' : ''}</p>
     </div>
   );
 }
