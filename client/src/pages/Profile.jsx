@@ -104,24 +104,48 @@ export default function Profile() {
   };
 
   // Handle Delete User
+  // const handleDeleteUser = async () => {
+  //   try {
+  //     dispatch(deleteUserStart());
+  //     const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+  //       method: "DELETE",
+  //     });
+
+  //     const data = await res.json();
+  //     if (data.success === false) {
+  //       dispatch(deleteUserFailure(data.message));
+  //       return;
+  //     }
+
+  //     dispatch(deleteUserSuccess(data));
+  //   } catch (error) {
+  //     dispatch(deleteUserFailure(error.message));
+  //   }
+  // };
+
   const handleDeleteUser = async () => {
     try {
       dispatch(deleteUserStart());
       const res = await fetch(`/api/user/delete/${currentUser._id}`, {
         method: "DELETE",
       });
-
+  
       const data = await res.json();
       if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
         return;
       }
-
+  
       dispatch(deleteUserSuccess(data));
+      setSuccessMessage("User has been deleted successfully!");
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 5000);
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
     }
   };
+  
 
   const handleSignOut = async () => {
     try {
@@ -157,6 +181,51 @@ export default function Profile() {
       setShowListingsError(true);
     }
   };
+
+  // HANDLE DELETE LISTING
+
+  // const handleListingDelete = async (listingId) => {
+  //   try {
+  //     const res = await fetch(`/api/listing/delete/${listingId}`, {
+  //       method: "DELETE",
+  //     });
+  //     const data = await res.json();
+  //     if (data.success === false) {
+  //       console.log(data.message);
+  //       return;
+  //     }
+
+  //     setUserListings((prev) =>
+  //       prev.filter((listing) => listing._id !== listingId)
+  //     );
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // };
+
+  const handleListingDelete = async (listingId) => {
+    try {
+      const res = await fetch(`/api/listing/delete/${listingId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        console.log(data.message);
+        return;
+      }
+  
+      setUserListings((prev) =>
+        prev.filter((listing) => listing._id !== listingId)
+      );
+      setSuccessMessage("Listing deleted successfully!");
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 5000);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  
 
   return (
     <div className="p-3 max-w-lg mx-auto">
@@ -243,12 +312,14 @@ export default function Profile() {
         <span onClick={handleSignOut} className="text-red-700 cursor-pointer">
           Sign Out
         </span>
+
       </div>
 
       <p className="text-red-700 mt-5">{error ? error : ""}</p>
       <p className="text-green-700">
         {updateSuccess ? "User is successfully updated!" : ""}
       </p>
+      <p className="text-green-700">{successMessage}</p>
 
       <button className="text-green-700 w-full" onClick={handleShowListings}>
         Show Listings
@@ -259,7 +330,9 @@ export default function Profile() {
 
       {userListings && (
         <div className="flex flex-col gap-4">
-          <h1 className="text-center mt-7 text-2xl font-semibold">Your Listings</h1>
+          <h1 className="text-center mt-7 text-2xl font-semibold">
+            Your Listings
+          </h1>
           {userListings.length > 0 &&
             userListings.map((listing) => (
               <div
@@ -278,11 +351,17 @@ export default function Profile() {
                 </Link>
 
                 <div className="flex flex-col items-center">
-                  <button className="text-red-700 uppercase">Delete</button>
+                  <button
+                    onClick={() => handleListingDelete(listing._id)}
+                    className="text-red-700 uppercase"
+                  >
+                    Delete
+                  </button>
                   <button className="text-green-700 uppercase">Edit</button>
                 </div>
               </div>
             ))}
+            <p className="text-green-700">{successMessage}</p>
         </div>
       )}
     </div>
