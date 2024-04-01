@@ -51,7 +51,6 @@ export default function Listing() {
     fetchListing();
   }, [params.listingId]);
 
-  console.log("loading", loading);
 
   return (
     <main>
