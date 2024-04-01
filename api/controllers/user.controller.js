@@ -46,7 +46,7 @@ export const deleteteUser = async (req, res, next) => {
 
   try {
     await User.findByIdAndDelete(req.params.id);
-    res.clearCookie('access_token');
+    res.clearCookie("access_token");
     res.status(200).json("User has been deleted Successfully");
   } catch (error) {
     next(error);
@@ -57,16 +57,27 @@ export const getUserListing = async (req, res, next) => {
   const userId = req.params.id;
 
   if (req.user.id === userId) {
-
     try {
-      const listings = await Listing.find({userRef: userId});
-      res.status(200).json(listings)
+      const listings = await Listing.find({ userRef: userId });
+      res.status(200).json(listings);
     } catch (error) {
-      next(error)
+      next(error);
     }
-
-  }else {
-    return next(errorHandler(401, 'You can view you own listing'))
+  } else {
+    return next(errorHandler(401, "You can view you own listing"));
   }
+};
 
-}
+export const getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!User) return next(errorHandler(404, "User Not Found"));
+
+    const { password: pass, ...rest } = user._doc;
+
+    res.status(200).json(rest);
+  } catch (error) {
+    next(error);
+  }
+};
