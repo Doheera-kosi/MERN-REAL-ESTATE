@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ListingItem from "../components/ListingItem";
+import Spinner from "../components/Spinner";
 
 export default function Search() {
   const navigate = useNavigate();
@@ -54,18 +56,19 @@ export default function Search() {
       const searchQuery = urlParams.toString();
       const res = await fetch(`/api/listing/get?${searchQuery}`);
       const data = await res.json();
-      if (data.length > 8) {
-        setShowMore(true);
+      if (Array.isArray(data) && data.length > 0) {
+        setListings(data);
+        if (data.length > 8) {
+          setShowMore(true);
+        }
       } else {
-        setShowMore(false);
+        setListings([]);
       }
-      setListings(data);
       setLoading(false);
     };
 
     fetchListings();
   }, [location.search]);
-
   const handleChange = (e) => {
     if (
       e.target.id === "all" ||
@@ -94,7 +97,7 @@ export default function Search() {
     if (e.target.id === "sort_order") {
       const sort = e.target.value.split("_")[0] || "created_at";
 
-      const order = e.target.value.split("_")[0] || "desc";
+      const order = e.target.value.split("_")[1] || "desc";
 
       setSidebardata({ ...sidebarData, sort, order });
     }
@@ -231,8 +234,8 @@ export default function Search() {
             >
               <option value="regularPrice_desc">Price high to low</option>
               <option value="regularPrice_asc">Price low to high</option>
-              <option value="created_at_desc">Latest</option>
-              <option value="created_at_asc">Oldest</option>
+              <option value="createdAt_desc">Latest</option>
+              <option value="createdAt_asc">Oldest</option>
             </select>
           </div>
 
@@ -252,7 +255,7 @@ export default function Search() {
           )}
           {loading && (
             <p className="text-xl text-slate-700 text-center w-full">
-              Loading...
+              <Spinner />
             </p>
           )}
 
