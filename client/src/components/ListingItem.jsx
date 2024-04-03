@@ -57,6 +57,7 @@ export default function ListingItem({ listing }) {
 
 ListingItem.propTypes = {
   listing: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     address: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
