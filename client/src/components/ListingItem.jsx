@@ -8,7 +8,7 @@ export default function ListingItem({ listing }) {
     <div className="bg-white shadow-md hover:shadow-lg transition-shadow overflow-hidden rounded-lg w-full sm:w-[330px]">
       <Link to={`/listing/${listing._id}`}>
         <img
-          src={listing.imageUrls[0] || "defaultImg"}
+          src={listing.imageUrls[0] || defaultImg}
           alt="listing cover"
           className="h-[320px] sm:h-[220px] w-full object-cover hover:scale-105 transition-scale duration-300"
         />
@@ -55,9 +55,17 @@ export default function ListingItem({ listing }) {
   );
 }
 
-// ListingItem.propTypes = {
-//   listing: PropTypes.shape({
-//     name: PropTypes.string.isRequired,
-//     // Add more PropTypes for other properties if needed
-//   }).isRequired,
-// };
+ListingItem.propTypes = {
+  listing: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    address: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    offer: PropTypes.bool.isRequired,
+    regularPrice: PropTypes.number.isRequired,
+    discountPrice: PropTypes.number,
+    type: PropTypes.string.isRequired,
+    bedrooms: PropTypes.number.isRequired,
+    bathrooms: PropTypes.number.isRequired,
+    imageUrls: PropTypes.arrayOf(PropTypes.string).isRequired,
+  }).isRequired,
+};
