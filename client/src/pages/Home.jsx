@@ -88,7 +88,7 @@ export default function Home() {
           ))}
       </Swiper>
 
-{/* Listings results for offer, sale and re */}
+      {/* Listings results for offer, sale and re */}
       <div className="max-w-8xl p-3 items-center flex flex-col gap-8 my-10">
         {offerListings && offerListings.length > 0 && (
           <div className="">
@@ -130,8 +130,9 @@ export default function Home() {
             </div>
           </div>
         )}
+
         {saleListings && saleListings.length > 0 && (
-          <div className="pl-16 w-full">
+          <div className="w-full lg:w-auto mx-auto lg:flex lg:flex-col">
             <div className="my-3">
               <h2 className="text-2xl font-semibold text-slate-600">
                 Recent places for sale
@@ -143,7 +144,7 @@ export default function Home() {
                 Show more places for sale
               </Link>
             </div>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 justify-center">
               {saleListings.map((listing) => (
                 <ListingItem listing={listing} key={listing._id} />
               ))}
