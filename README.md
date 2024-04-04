@@ -18,7 +18,7 @@ This is a full-stack web application for real estate listings built using the ME
 - **Backend**: Node.js, Express.js
 - **Database**: MongoDB
 - **Authentication**: JSON Web Tokens (JWT), OAuth
-- **Deployment**: Heroku, Netlify
+- **Deployment**: Render
 
 ## Installation
 1. Clone the repository: `git clone https://github.com/your-username/your-repo.git`
